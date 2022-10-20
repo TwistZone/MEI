@@ -77,11 +77,15 @@ else:
     os.mkdir(test_dir)
     os.mkdir(dataset_dir)
 
+with open("seeds.txt","w") as f:
+    f.write(str(seed) + "\n")
+
 os.chdir(test_dir)
 log(f"Output results to {test_dir}")
 #create results file
 with open("results.txt", "w") as f:
     f.write("Dinic time MPM time EK time vertexes probability capacity seed\n")    
+
 
 for p in np.arange(0.9,0.0,-0.1):
     p = p.round(2)
