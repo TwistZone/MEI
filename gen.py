@@ -26,7 +26,7 @@
 
 import random
 import sys
-
+sys.setrecursionlimit(9999)
 # ---------------------------
 # graph traversal
 # ---------------------------

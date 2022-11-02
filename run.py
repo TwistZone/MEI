@@ -1,6 +1,7 @@
 import os
 import numpy as np
-
+import sys
+sys.setrecursionlimit(9999)
 
 def run(executable1, executable2,executable3, home_dir, result_dir, seed, max_time, file, input, n, p,r):
     os.chdir(home_dir)
@@ -24,12 +25,15 @@ def log(string):
         f.write(string+"\n")
     print(string)
 
-vertexes = 1500
-max_cap = 300
-seed = 666
+vertexes = 10000
+max_cap = 5000
+seed = 155551
 max_time = 60
-step = 50
-step2 = 25
+start1 = 500
+start2 = 500
+step = 500
+step2 = 500
+
 
 exec1 = "Dinic.cpp"
 exec2 = "MPM.cpp"
@@ -77,7 +81,7 @@ else:
     os.mkdir(test_dir)
     os.mkdir(dataset_dir)
 
-with open("seeds.txt","w") as f:
+with open("seeds.txt","a") as f:
     f.write(str(seed) + "\n")
 
 os.chdir(test_dir)
@@ -90,8 +94,8 @@ with open("results.txt", "w") as f:
 for p in np.arange(0.9,0.0,-0.1):
     p = p.round(2)
     fails = 0    
-    for n in range(5,vertexes +1,step):
-        for r in range(5,max_cap+1,step2):
+    for n in range(start1,vertexes +1,step + start1):
+        for r in range(start2,max_cap+1,step2 + start2):
             seed = seed + 10
             log(f"\nNew test data\nProbability: {p} \nVertexes: {n} \nMaximum Capacity: {r}\nSeed: {seed}")
             #generate data
@@ -101,10 +105,13 @@ for p in np.arange(0.9,0.0,-0.1):
             log("Data generated!")
             #run c code
             fp =  dataset_dir + "/" + file
-            with open(fp,"r") as f:
-                if f.read() == "-1":
-                    os.remove(fp)
-                    continue    
+            try:
+                with open(fp,"r") as f:
+                    if f.read() == "-1":
+                        os.remove(fp)
+                        continue 
+            except FileNotFoundError:  
+                    continue
             if run(out1, out2,out3, home_path, test_dir, seed, max_time, file, dataset_dir, n, p,r):
                 fails = fails + 1    
                 if fails > 4: 
