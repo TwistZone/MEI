@@ -1,20 +1,20 @@
 import os
 import numpy as np
 import sys
-sys.setrecursionlimit(9999)
 
 def run(executable1, executable2,executable3, home_dir, result_dir, seed, max_time, file, input, n, p,r):
     os.chdir(home_dir)
 
     out = os.popen(f'./{executable1} {max_time} "{input}/{file}"').read()
-    output1 = out.replace("\n", "")
+    arcs = out.split("\n")[0]
+    output1 = out.split("\n")[1]
     out = os.popen(f'./{executable2} {max_time} "{input}/{file}"').read()
-    output2 = out.replace("\n", "")
+    output2 = out.split("\n")[1]
     out = os.popen(f'./{executable3} {max_time} "{input}/{file}"').read()
-    output3 = out.replace("\n", "")
+    output3 = out.split("\n")[1]
     os.chdir(result_dir)
     with open("results.txt", "a") as f:
-        f.write(f"{output1} {output2} {output3} {n} {p} {r} {seed}\n")
+        f.write(f"{arcs} {output1} {output2} {output3} {n} {p} {r} {seed}\n")
     f.close()    
     if "-1" in output1 or "-1" in output2 or "-1" in output3:
         return 1
@@ -25,14 +25,14 @@ def log(string):
         f.write(string+"\n")
     print(string)
 
-vertexes = 10000
-max_cap = 5000
-seed = 155551
+vertexes = 2000
+max_cap = 4000
+seed = 6969
 max_time = 60
-start1 = 500
-start2 = 500
-step = 500
-step2 = 500
+start1 = 200
+start2 = 400
+step = 200
+step2 = 400
 
 
 exec1 = "Dinic.cpp"
@@ -88,14 +88,14 @@ os.chdir(test_dir)
 log(f"Output results to {test_dir}")
 #create results file
 with open("results.txt", "w") as f:
-    f.write("Dinic time MPM time EK time vertexes probability capacity seed\n")    
+    f.write("Arcs Dinic MPM EK vertexes probability capacity seed\n")    
 
 
-for p in np.arange(0.9,0.0,-0.1):
+for p in np.arange(0.1,1,0.1):
     p = p.round(2)
     fails = 0    
-    for n in range(start1,vertexes +1,step + start1):
-        for r in range(start2,max_cap+1,step2 + start2):
+    for n in range(start1,vertexes +1,step):
+        for r in range(start2,max_cap+1,step2):
             seed = seed + 10
             log(f"\nNew test data\nProbability: {p} \nVertexes: {n} \nMaximum Capacity: {r}\nSeed: {seed}")
             #generate data
@@ -105,22 +105,18 @@ for p in np.arange(0.9,0.0,-0.1):
             log("Data generated!")
             #run c code
             fp =  dataset_dir + "/" + file
-            try:
-                with open(fp,"r") as f:
-                    if f.read() == "-1":
-                        os.remove(fp)
-                        continue 
-            except FileNotFoundError:  
-                    continue
-            if run(out1, out2,out3, home_path, test_dir, seed, max_time, file, dataset_dir, n, p,r):
-                fails = fails + 1    
+            with open(fp,"r") as f:
+                if f.read() == "-1":
+                    os.remove(fp)
+                    continue 
+            run(out1, out2,out3, home_path, test_dir, seed, max_time, file, dataset_dir, n, p,r)
+            '''  fails = fails + 1    
                 if fails > 4: 
                     with open('results.txt','r') as f:
-                        lines = f.readlines()
-                    f.close()    
+                        lines = f.readlines()  
                     with open('results.txt','w') as f:
                         f.writelines(lines[:-5])
                     break
             else: 
                 fails = 0    
-        
+            '''
