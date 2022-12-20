@@ -25,14 +25,14 @@ def log(string):
         f.write(string+"\n")
     print(string)
 
-vertexes = 2000
-max_cap = 4000
-seed = 6969
-max_time = 60
-start1 = 200
-start2 = 400
-step = 200
-step2 = 400
+vertexes = 1000
+max_cap = 500
+seed = 6969 #2342135 #341253
+max_time = 10
+start1 = 100
+start2 = 50
+step = 100
+step2 = 50
 
 
 exec1 = "Dinic.cpp"

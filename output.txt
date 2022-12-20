@@ -1,0 +1,38 @@
+edgePlot <- function(test,p){  
+  
+  tlim = 60
+  mydir = paste(mydir,test,"/results.txt",sep = "")
+  data <- read.table(mydir,header = TRUE)
+  df <- subset(data, probability == p) 
+  v = max(df$edges)
+  xpos = v - v/6
+  df$edges <- df$edges*df$edges *ceil((df$edges-1)/2)
+  df <- df %>%  
+    mutate(ee = edges)
+  df <- df %>%  
+    mutate(em = edges)
+  
+  df$EK[df$EK > 60 ] <- NA
+  df$ee[df$EK > 60 ] <- NA
+  df$Dinic[df$Dinic > 60 ] <- NA
+  df$edges[df$Dinic > 60 ] <- NA
+  df$MPM[df$MPM > 60 ] <- NA
+  df$em[df$MPM > 60 ] <- NA
+  
+  tt = paste("Probability ",p*100,"%",sep="")
+  ggplot(df) + 
+    geom_jitter(aes(df$edges,df$Dinic),colour="#56B4E9")+ geom_smooth(aes(df$edges,df$Dinic),colour="#56B4E9",method='lm', formula= nthroot(y,2) ~ x,se = FALSE) +
+    geom_jitter(aes(df$ee,df$EK),colour = "#FF33CC")+ geom_smooth(aes(df$ee,df$EK),colour="#FF33CC",method='lm', formula= nthroot(y,2) ~ x,se = FALSE) +
+    geom_jitter(aes(df$em,df$MPM),colour="#0033FF")+ geom_smooth(aes(df$em,df$MPM),colour="#0033FF",method='lm', formula= nthroot(y,3) ~ x,se = FALSE) +
+    geom_text(x = xpos,y = 30,colour = "#56B4E9" ,label = lm_eqn(df$edges,df$Dinic,2,"Dinic:"))+ 
+    geom_text(x = xpos,y = 40,colour = "#FF33CC" ,label = lm_eqn(df$ee,df$EK,2,"EK:")) +  
+    geom_text(x = xpos,y = 50,colour = "#0033FF" ,label = lm_eqn(df$em,df$MPM,3,"MPM:")) +
+    geom_text(aes(xpos, tlim-5, label = "Max CPU Time = 60", vjust = - 1),col = "black") +
+    geom_hline(aes(yintercept=tlim)) +
+    theme_bw()+
+    theme(axis.text.x = element_text(size = 14), axis.title.x = element_text(size = 16),
+          axis.text.y = element_text(size = 14), axis.title.y = element_text(size = 16),
+          plot.title = element_text(size = 20, face = "bold", color = "darkgreen")) +
+    labs(title = tt,x = "edges", y = "Time(seconds)")
+  
+}
